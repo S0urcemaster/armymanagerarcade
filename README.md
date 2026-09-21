@@ -2,6 +2,8 @@
 
 Mobile Web Game about building up an army, battle with other armies and advance in history
 
+Keep the client English
+
 ## Anfang
 
 Man startet als eine Person mit etwas Geld und Ausrüstung
@@ -12,19 +14,17 @@ Man sieht eine Liste passender Gegner, die man sich zutrauen könnte, zu schlage
 
 Die ersten 10 Gegner, die man bezwingt, kommen unversehrt zur eigenen Truppe hinzu
 
-Mit 2 Mann könnte man sich mehr als einen Gegner zutrauen. Das Angebot an Gegnern variiert entsprechend der eigenen Spielstufe. Verliert man auf diesem Niveau, muss man wieder bei 1 anfangen. 
+Dann, mit 2 Mann könnte man sich mehr als einen Gegner zutrauen. Das Angebot an Gegnern variiert entsprechend der eigenen Spielstufe. Verliert man auf diesem Niveau, muss man wieder bei 1 anfangen
 
 Gewinnt man gegen einen stärkeren Gegner, wechseln mehr der gegenerischen Truppen auf die eigene Seite. Verliert man gegen einen schwächeren Gegner, erleidet man ebenso mehr Verluste
 
-## Qualitäten
-
-Haltung, Risiko
-
 ## Kampf
 
-Nachdem man das Schlachtfeld betreten hat, kann man noch eine Haltung wählen, und so ein letztes Mal Einfluss nehmen. Man geht immer als Angreifer vor. Verteidigen beide Parteien, verliert man einen Teil der Truppen als Deserteure. Greift man an und wird abgewehrt, verliert man 50% seiner Truppen
+Wie bei einem Soldaten gegen einen 
 
-Ein Angriff kann sich also weiter unterteilen : Zentral, Linke Flanke, Rechte Flanke, Fernangriff, Infanterie, Kavallerie. Man kann so gut einen Verlust vermeiden, da man die finale Aufstellung des (Computer-) Gegners kennt
+Nachdem man das Schlachtfeld betreten hat, kann man einstellen, welcher Teil seiner Armee angreifen oder verteidigen soll
+
+Der Kampf zwischen 2 Armeen unterteilt sich also in : Zentral, Linke Flanke, Rechte Flanke, dann Fernangriff, Infanterie, Kavallerie. Man kann zB sagen: Rechte Flanke defensiv, Kavallerie aggressiv - In den Flanken oder zentral sind alle Truppentypen enthalten
 
 Bei der Gegnerauswahl sieht man nicht alle Details, nur genau die Belohnung, die man vom Auftraggeber bekommt im Falle des Sieges. Es gibt so ein gewisses Risiko und später ein Gefühl dafür, größere und stärkere Gegner besiegt zu haben
 
@@ -62,7 +62,54 @@ Man wählt also unter den angebotenen Rekruten aus bis man voll ist oder kein Ge
 
 Es gibt auch Ausrüstung. Manchmal sind Rekruten wegen ihrer Ausrüstung gut. In einem Screen nach der Rekrutierung rüstet man seine Armee aus
 
-Jeder 
-- Speer
-- Schild
-- Bogen
+Infantrie
+- Speer + Schild
+Fernkämpfer
+- Pfeil + Bogen
+Kavallerie
+- Pferd und Lanze
+
+Jeder Soldat kann eine Rüstung bekommen
+
+Zur Vereinfachung hat jeder Soldat mindestens eine "Schlechte Ausrüstung". Es gibt weitere Stufen/Qualitäten
+
+- Schlechte Ausrüstung
+- Gebrauchte Ausrüstung
+- Akzeptable Ausrüstung
+- Gute Ausrüstung
+- Neue Ausrüstung
+- Aufgewertete Ausrüstung
+- Modernste Ausrüstung
+
+Das Spiel geht über eine gewisse Kampagne, und Ausrüstung verliert pro Einsatz eine Stufe. Man soll also beste Ausrüstung für die letzte Spielphase vorhalten/ sparen wollen
+
+## Kampf
+
+Die 6 .. Zonen, sag ich jetzt mal, stehen sich gegenüber:
+
+Zentral - Zentral
+Rechts - Links
+Links - Rechts
+Kavallerie - Kavallerie
+Fernkampf - Fernkampf
+Infanterie - Infanterie
+
+Bei Kampfbeginn stehen sie die Einheitstypen nicht gegensätzlich gegenüber. Erst muss man den gegnerischen,  gleichen Einheitentyp besiegen (in die Flucht schlagen mit mehr als 50% Verlust), dann stößt der Truppenteil, der gewonnen hat zu seinem bevorzugten Angriffsziel. ZB hat die Kavallerie gewonnen, greift sie danach ebenso die Fernkämpfer mit 50% Bonus an
+
+Die Kämpfe zwischen den Zonen werden nach Breite der Angriffslinie berechnet, so dass sich immer gleich viel Soldaten auf ein mal gegenüberstehen. Ist eine Reihe ausgefochten, einer von beiden Soldaten, die sich gegenüber stehen, ist verwundet oder tot, treten die Gewinner ans Ende der Schlange. Verwundete werden bis zur nächsten Schlacht geheilt, treten aber nicht mehr in die Schlacht
+
+Verwundete oder getötete Soldaten verlieren ihre Ausrüstung. Der Gewinner einer Schlacht bekommt am Ende alle verlorene Ausrüstung mit der üblichen Stufe Qualitätsverlust
+
+Der Kampf zwischen 2 sich gegenüber stehenden Soldaten wird augsefochten, indem der Vorteil/ die stärkste Eigenschaft des Soldaten mit seiner Zuordnung zum Truppenteil mit demselben Vorzug verrechnet wird. Der stärkste Wert wird B Waffenqualität gegen den schwächsten Wert des Gegners verrechnet, abzüglich Rüstung. Der erste mit weniger als 50% Lebenspunkten fällt aus dem Kampf und der andere gewinnt. Ein Schlag kann tödlich sein, wenn er die Lebenspunkte eines Gegners mit einem Schlag auf 0 bringt
+
+ZB hat ein Soldat, der Infantrie zugeordnet ist und zentral steht, bei Infantrie seinen höchsten Wert, steht somit gut, aber bei der Flanke wäre er lieber rechts, usw
+
+Ein Soldat hat also 2 Spezialisierungen:
+
+- Typ
+- Flanke
+
+und man muss die rekrutierten Soldaten möglichst optimal zuteilen
+
+Ein Soldat hat einen weiteren Wert : Zugehörigkeit. Wird ein Soldat aus einer existierenden Gruppe herausgenommen oder wird eine Gruppe verteilt, verlieren die Mitglieder an Zugehörigkeitsgefühl. Soldaten mit hoher Zugehörigkeit bekommen einen Bonus beim Kampf
+
