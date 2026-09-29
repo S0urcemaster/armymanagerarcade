@@ -25,6 +25,9 @@ See [PROCESS.md](PROCESS.md) for the ranking and decision rules.
 - [REQUIREMENTS.md](REQUIREMENTS.md) contains accepted, durable requirements.
 - [DECISIONS.md](DECISIONS.md) records choices and their consequences.
 - [PROCESS.md](PROCESS.md) defines how work is selected and decisions are made.
+- [COMBAT.md](COMBAT.md) contains the accepted combat model and its open edges.
+- [ECONOMY.md](ECONOMY.md) contains accepted resources, rewards, and ownership
+  rules.
 - [NEXT.md](NEXT.md) is the small, current project frontier. It is rewritten as
   the project changes rather than used as an exhaustive backlog.
 

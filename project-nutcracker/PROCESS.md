@@ -35,14 +35,17 @@ requirements.
 When the recommended step needs owner judgment:
 
 1. Present exactly four high-weight topics and let the owner select one.
-2. Only after that selection, give the minimum context needed to decide.
-3. Ask exactly one decision question about the selected topic.
-4. Present exactly four substantially different solution choices.
-5. Describe the effect and main trade-off of each choice.
-6. Make a recommendation when the available evidence supports one.
-7. Allow the owner to adapt or combine choices instead of treating them as
+2. If the selected topic is still broad, present its four highest-weight
+   subtopics and let the owner narrow the scope again.
+3. Repeat topic narrowing only while it prevents premature detail.
+4. Once the topic is decision-sized, give the minimum context needed to decide.
+5. Ask exactly one decision question about the selected topic.
+6. Present exactly four substantially different solution choices.
+7. Describe the effect and main trade-off of each choice.
+8. Make a recommendation when the available evidence supports one.
+9. Allow the owner to adapt or combine choices instead of treating them as
    a rigid multiple-choice form.
-8. Record the result and its consequences after the owner chooses.
+10. Record the result and its consequences after the owner chooses.
 
 Options should describe outcomes or experiences, not obscure implementation
 details. Defer questions whose answers would not affect current work.

@@ -50,12 +50,15 @@ framework, a visible path of advancement, and a definitive long-term goal.
 
 Each owner decision round has two distinct selection steps. First, the agent
 presents exactly four high-weight project topics and the owner selects one.
-Only then does the agent present exactly four solution choices for the selected
-topic.
+If the selected topic remains too broad for a useful decision, the agent
+presents exactly four high-weight subtopics. This narrowing may repeat before
+the agent presents four concrete solution choices.
 
 ### Consequences
 
 - Topic selection remains strategic and avoids premature detail.
+- Broad topics can be narrowed hierarchically without pretending they are
+  already decision-sized.
 - Choosing a topic is distinct from choosing its solution.
 - Solution choices may still be adapted or combined by the owner.
 
@@ -176,11 +179,11 @@ combat, improving opponent selection and initial orders.
 
 ## D-008 — Ranked realms instead of a scheduled sports league
 
-**Status:** Accepted
+**Status:** Partially superseded by D-016
 
-Replace the fixed sequence of league opponents with a map of competing ancient
-realms. Cities, kingdoms, duchies, and larger empires fight one another and are
-ordered in a shared ranking. Each army has a prominent, persistent NPC leader.
+This decision replaced the conventional league with ranked ancient realms and
+persistent NPC leaders. D-016 later replaced the dynamic opponent structure
+with a scripted sequence of stages and places.
 
 The sports analogy remains in the ranking, competitive advancement, and goal of
 reaching the top, but no longer requires a conventional fixture schedule.
@@ -267,7 +270,7 @@ until the roster is researched and reviewed.
 
 ## D-012 — Direct rank exchange and challenge events
 
-**Status:** Accepted
+**Status:** Partially superseded by D-016
 
 When the player defeats a higher-ranked army in a ranking-eligible battle, the
 two armies exchange positions directly. NPC armies may also issue event-driven
@@ -283,3 +286,126 @@ challenges with special battle conditions.
 - It must always be clear before acceptance whether a challenge affects rank.
 - Challenge frequency, refusal rules, stakes, and NPC-versus-NPC rank exchanges
   remain unresolved.
+
+## D-013 — Type fronts and breakthrough cycle
+
+**Status:** Accepted
+
+Build combat around three troop-type fronts: spearmen, archers, and cavalry.
+Soldiers resolve individual attacks using a combat value modified by advantage
+or disadvantage against the target type.
+
+Use a cyclic matchup advantage:
+
+- archers defeat spearmen;
+- spearmen defeat cavalry;
+- cavalry defeat archers.
+
+Archers attack opposing spearmen at the start of a round. Every available
+archer fires once; if archers outnumber the target formation, soldiers in its
+front rows may be targeted repeatedly. Spearmen then fight opposing spearmen at
+the front rank. Cavalry does not act in the opening round and begins fighting
+opposing cavalry from the second round onward.
+
+When a mirrored formation is defeated, the surviving force breaks through and
+joins another fight. Victorious cavalry proceeds to the opposing archers. The
+destination of victorious spearmen remains open: the cyclic advantage suggests
+cavalry, while the current example has them reaching the opposing archers.
+
+### Consequences
+
+- Combat creates a race between breakthroughs on three connected fronts.
+- Army composition affects both initial matchups and the consequences of a
+  breakthrough.
+- Large formations still resolve through individual soldier interactions.
+- Front-rank and target-selection rules must be deterministic and visible.
+- Damage, routing, formation defeat, commands, and overall victory conditions
+  remain unresolved.
+- The breakthrough destination for spearmen requires clarification when combat
+  detail is revisited.
+
+## D-014 — Gold, recruit intelligence, and espionage points
+
+**Status:** Accepted
+
+Use gold as the main purchasing currency. Recruits appear in a changing pool
+and have different gold prices. Some recruits also bring intelligence; hiring
+them awards espionage points in addition to adding them to the army.
+
+Espionage points are a separate resource spent to investigate armies in the
+world ranking. Investigation proceeds through the ranking and reveals
+decision-relevant opponent information before combat.
+
+### Consequences
+
+- Recruit value combines combat usefulness, group membership, equipment,
+  development potential, and possible intelligence value.
+- A militarily weak recruit may still be strategically desirable.
+- Intelligence has an opportunity cost because obtaining it can consume gold
+  and roster capacity through recruitment.
+- Espionage points bring forward information that would otherwise be revealed
+  during combat phases.
+- The exploration order, information costs, recruit dismissal rules, and
+  safeguards against recruitment exploits remain unresolved.
+
+## D-015 — Development, loot, and territory as reasons for war
+
+**Status:** Accepted
+
+Battles create lasting development and economic consequences:
+
+- surviving soldiers gain experience;
+- soldiers who actively fought gain more experience;
+- soldiers who were wounded and survived gain an additional experience reward;
+- killed soldiers leave behind their equipment and personal gold;
+- equipment not needed by the army can be sold;
+- victory can conquer territory, produce limited plunder, and add recurring
+  income;
+- the player begins with enough gold to enter the initial cycle of recruitment
+  and combat.
+
+Every soldier has a personal gold reserve distinct from the army treasury.
+
+### Consequences
+
+- War advances veteran soldiers while also risking their permanent loss.
+- Battlefield casualties transfer or release material value into the post-battle
+  economy.
+- Territory connects combat success to longer-term income.
+- Experience, loot, conquest, and rank can make the same opponent attractive for
+  different reasons.
+- Wounds must not become something the player intentionally farms without
+  meaningful risk.
+- Battlefield recovery, ownership after defeat, plunder limits, territorial
+  control, taxes, and the relationship between personal and army gold remain
+  unresolved.
+
+## D-016 — Scripted progression through places
+
+**Status:** Accepted
+
+Do not use a league or a dynamic sequence of opponents. Progress through a
+scripted order of stages, with one primary opponent after another. Each stage is
+associated with a place, such as a settlement, city, or territory, and its NPC
+army.
+
+The player may skip opponents and challenge a later stage. On victory, the
+player exchanges places with the defeated opponent. On defeat, the player falls
+back to the previous place in the progression.
+
+Places provide different recurring income and may have additional properties
+that influence preparation for, or conditions in, the next battle.
+
+### Consequences
+
+- Progression is authored and can build a deliberate difficulty and historical
+  learning curve.
+- The 48 persistent NPC armies can populate 48 scripted stages rather than a
+  simulated league.
+- Skipping creates a risk-reward choice between faster advancement and a harder
+  opponent.
+- Place exchange connects victory, territory, income, and rank in one action.
+- Places can create strategic variety without requiring a fully dynamic world
+  simulation.
+- The treatment of skipped opponents, defeat at the first place, NPC movement,
+  and exact place modifiers remain unresolved.

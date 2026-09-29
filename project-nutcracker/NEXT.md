@@ -4,20 +4,20 @@ This file contains the few concerns currently most likely to move or block the
 project. Their order must be reviewed against the actual project state whenever
 work resumes.
 
-## 1. Define the core combat model
+## 1. Complete the battle loop
 
 **Needs:** Owner decision
 
-Turn individual soldier encounters, group matchups, combat phases, partial
-information, and player commands into one coherent arcade battle system.
+Complete the accepted three-front breakthrough model with understandable
+damage, formation defeat, player commands, retreat, and overall victory.
 
 ## 2. Define the strategic world loop
 
 **Needs:** Owner decision
 
-Connect the global map, 48 persistent NPC armies, direct rank exchanges, army
-growth, opponent selection, NPC conflicts, and special events into a repeatable
-campaign loop.
+Connect 48 scripted opponents and places, optional skipping, place exchange,
+defeat fallback, gold, recruitment, espionage-point exploration, loot, and
+place income into a repeatable campaign loop.
 
 ## 3. Define army development and identity
 
@@ -35,5 +35,5 @@ product, including its technical foundation and completion criteria.
 
 ## Recommended next step
 
-Choose the core combat model. It is the largest unresolved dependency for army
-attributes, opponent styles, battle presentation, and the first playable build.
+Complete the battle loop. Its remaining boundaries affect soldier attributes,
+opponent styles, battle presentation, and the first playable build.
