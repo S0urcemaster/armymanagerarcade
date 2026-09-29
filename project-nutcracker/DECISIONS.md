@@ -518,3 +518,143 @@ Accepted examples:
 - Tactics need visible counters and must not become unconditional upgrades.
 - Strategy availability may depend on troop type, leader, training, technology,
   equipment, or place, but those unlock rules remain open.
+
+## D-021 — Three-step individual combat resolution
+
+**Status:** Accepted
+
+A block contains ten ranks, which are processed over successive combat ticks.
+The width of the active attack line depends on the formation or army scale and
+remains to be specified.
+
+Each opposing soldier pair resolves combat in three steps:
+
+1. **Initiative:** both soldiers roll for initiative, with experience improving
+   the chance of winning. Only the initiative winner earns an attack attempt.
+2. **Hit:** the winner rolls to hit. The chance combines soldier properties,
+   suitability for the assigned position, daily form, and luck.
+3. **Consequence:** a successful hit causes a wound or death depending primarily
+   on weapon value against armor value. Weapons and armor use a small number of
+   quality tiers.
+
+A soldier who failed to act must win initiative in a later exchange before a
+counterattack can occur.
+
+### Consequences
+
+- Experience creates an advantage before damage is rolled without guaranteeing
+  a hit.
+- Correct formation placement matters independently of equipment.
+- Daily form and luck create variation between otherwise similar soldiers.
+- Weapon and armor quality influence severity rather than initiative.
+- The formulas, soldier properties, tie behavior, exchange frequency, quality
+  tiers, and exact wound effects remain unresolved.
+
+## D-022 — Wounds, replacement, and attack endurance
+
+**Status:** Refined by D-025
+
+A wounded soldier immediately leaves the current battle and the next available
+soldier advances. Wounded survivors recover fully before the next battle.
+
+An experienced soldier may defeat several successive opponents, but cannot
+remain at the front indefinitely. After roughly five attack attempts, the
+soldier reaches their endurance limit and moves to the back of the block, where
+they may eventually cycle forward again.
+
+### Consequences
+
+- A strong or lucky individual can create a visible run of victories.
+- Endurance prevents one soldier from defeating an arbitrarily large block.
+- Block order changes dynamically as wounded and exhausted soldiers leave the
+  active line.
+- Wounds have tactical and experience consequences without requiring recovery
+  management between battles.
+- The exact endurance value, whether misses consume endurance, and how quickly a
+  rotated soldier becomes available again remain provisional.
+
+## D-023 — Minimal soldier properties and equipment-defined role
+
+**Status:** Accepted
+
+Alongside accumulated experience and carried equipment, every soldier has four
+core personal properties:
+
+- **Talent:** an innate value that does not change;
+- **Fitness:** a condition value that can improve or decline;
+- **Belonging:** how comfortable and attached the person feels as a soldier in
+  their current social and military context;
+- **Troop-type aptitude:** an innate suitability for one troop type.
+
+A soldier is not permanently locked to the preferred troop type. Equipment
+determines the actual battlefield role, so changing the weapon, armor, mount, or
+other relevant loadout can assign a different task. Position suitability is
+therefore based primarily on whether the soldier carries the correct equipment
+for the assigned block rather than on another positional attribute.
+
+### Consequences
+
+- Talent creates lasting individual identity while fitness provides a changing
+  development axis.
+- Belonging connects group history to individual combat performance.
+- Troop-type aptitude makes natural roles meaningful without forbidding
+  retraining or emergency reassignment.
+- Equipment affects both combat quality and which role a soldier can perform.
+- Exact value ranges and how each property enters combat remain unresolved.
+
+## D-024 — Combat cycles, automatic playback, and the fifty-percent limit
+
+**Status:** Accepted
+
+Each soldier attack is one combat cycle. An attack may fail to produce a hit or
+casualty, so opposing soldiers can repeat cycles until one is removed or either
+or both become exhausted and rotate out.
+
+A small battle should normally resolve after roughly 10–20 manual "Continue"
+advances. Longer battles emerge at higher army levels through more encounters,
+failed attacks, exhaustion, and rotation.
+
+The same simulation supports two playback modes:
+
+- manual step-by-step advancement with "Continue";
+- automatic advancement with "Start" and "Pause".
+
+An army cannot be completely annihilated in normal battle. The first army to
+reach fifty percent losses is defeated and the other army wins. The player may
+also retreat earlier under certain conditions, accepting additional losses as
+the cost of disengagement.
+
+### Consequences
+
+- Manual and automatic playback must produce equivalent simulation results.
+- Automatic playback must pause when a meaningful decision or exceptional event
+  occurs.
+- Small battles have a short target interaction length while large battles can
+  feel materially longer without changing the basic rules.
+- Victory preserves survivors on both sides for persistent armies and future
+  encounters.
+- The definition of a counted loss, cycle parallelism at large scale, playback
+  speed, exhaustion resolution, and retreat cost remain unresolved.
+
+## D-025 — Rotation endurance and total exhaustion
+
+**Status:** Accepted
+
+A soldier rotates to the back of the block after roughly five consecutive
+attack attempts, as established in D-022. Across repeated appearances, a soldier
+can make roughly fifty attack attempts in total during one battle. Reaching that
+total makes the soldier exhausted and no longer combat-ready for the remainder
+of the battle.
+
+Exhausted soldiers count as losses toward the fifty-percent army defeat
+threshold, alongside wounded and killed soldiers.
+
+### Consequences
+
+- Front-line rotation and total battle endurance are separate limits.
+- An army can lose through exhaustion without every affected soldier being
+  wounded or killed.
+- Defensive tactics can pursue victory by exhausting the opponent.
+- Five and fifty are provisional balancing targets, not fixed simulation laws.
+- Recovery after battle and whether failed attacks consume endurance remain
+  unresolved details.

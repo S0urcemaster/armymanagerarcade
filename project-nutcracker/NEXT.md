@@ -4,27 +4,27 @@ This file contains the few concerns currently most likely to move or block the
 project. Their order must be reviewed against the actual project state whenever
 work resumes.
 
-## 1. Complete the battle loop
+## 1. Define the strategic campaign loop
 
 **Needs:** Owner decision
 
-Complete the accepted three-front breakthrough model with understandable
-damage, formation defeat, player commands, retreat, and overall victory.
+Connect the scripted sequence of places, opponent skipping, victory exchange,
+defeat fallback, income, recruitment, espionage, loot, and army growth into one
+clear cycle.
 
-## 2. Define the strategic world loop
+## 2. Define army development and identity
 
 **Needs:** Owner decision
 
-Connect 48 scripted opponents and places, optional skipping, place exchange,
-defeat fallback, gold, recruitment, espionage-point exploration, loot, and
-place income into a repeatable campaign loop.
+Define recruitment offers, belonging, training, equipment ownership, leaders,
+and how persistent individual stories scale through grouped armies.
 
-## 3. Define army development and identity
+## 3. Structure the 48-stage campaign
 
-**Needs:** Later owner decision
+**Needs:** Product and content design
 
-Define the small soldier model, recruitment in existing groups, belonging,
-training, equipment, leaders, and the zoomable formation hierarchy.
+Distribute global historical realms, leaders, cities, army sizes, incomes,
+place properties, and difficulty across the five army levels.
 
 ## 4. Define the first final-game increment
 
@@ -35,5 +35,5 @@ product, including its technical foundation and completion criteria.
 
 ## Recommended next step
 
-Complete the battle loop. Its remaining boundaries affect soldier attributes,
-opponent styles, battle presentation, and the first playable build.
+Define the strategic campaign loop. Combat now has a sufficient conceptual core,
+while the surrounding progression still needs one coherent structure.

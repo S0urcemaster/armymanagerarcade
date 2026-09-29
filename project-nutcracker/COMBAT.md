@@ -58,10 +58,79 @@ army size increases.
 
 ## Combat ticks
 
-One combat tick resolves the fight between two currently opposing ranks. The
-player advances to another tick with "Continue" when no intervening command is
-needed. Across successive ticks, ranks inflict losses, advance, and are
-gradually consumed.
+Each soldier attack is a combat cycle. The player can advance cycles manually
+with "Continue" or run the same simulation automatically with "Start" and
+"Pause". Automatic playback pauses for meaningful decisions or exceptional
+events.
+
+An attack may have no effect. Opponents repeat cycles until someone is removed
+or either or both become exhausted and rotate. A small battle should usually
+resolve in roughly 10–20 manual advances; higher army levels create longer
+battles through more encounters, failed attacks, exhaustion, and rotation.
+
+Blocks contain ten ranks. Attack-line width depends on formation scale and is
+still open.
+
+## Individual encounter
+
+Each opposing pair resolves through three rolls:
+
+### 1. Initiative
+
+Both soldiers contest initiative. Experience increases the chance of winning.
+Only the initiative winner receives an attack attempt. A counterattack requires
+winning initiative in a later exchange.
+
+### 2. Hit
+
+The acting soldier rolls to hit. The chance is a combination of soldier
+properties, suitability for the assigned position, daily form, and luck.
+
+### 3. Consequence
+
+A successful hit becomes a wound or death based primarily on weapon value
+against armor value. Weapons and armor have a small set of quality tiers that
+are not defined yet.
+
+### Wounds and rotation
+
+A wounded soldier immediately leaves the battle and the next available soldier
+advances. Wounded survivors recover fully for the next battle.
+
+A soldier may defeat several successive opponents, but after roughly five
+attack attempts reaches an endurance limit and moves to the back of the block.
+This allows memorable individual streaks while preventing one fighter from
+remaining at the front indefinitely.
+
+This five-attempt limit controls one appearance at the front. Across repeated
+rotations, a soldier can make roughly fifty attack attempts during a battle.
+After reaching that total, the soldier is exhausted, no longer combat-ready,
+and counts toward the army's defeat threshold.
+
+## Defeat and retreat
+
+Normal combat ends when the first army has fifty percent of its soldiers no
+longer combat-ready. Wounded, killed, and fully exhausted soldiers count toward
+that threshold. The army is defeated, preventing complete annihilation and
+preserving persistent survivors.
+
+The player may be able to retreat before the threshold under certain
+conditions. Retreat imposes additional losses whose calculation is still open.
+
+## Soldier properties
+
+Alongside accumulated experience and carried equipment:
+
+- **Talent:** innate and immutable
+- **Fitness:** can improve or decline
+- **Belonging:** attachment and comfort in the current military and social group
+- **Troop-type aptitude:** innate preference for a troop type
+
+The soldier's equipment loadout determines the actual battlefield role. A
+soldier can serve outside the preferred type by receiving the corresponding
+weapon, armor, mount, or other required equipment. Suitability for a block is
+therefore a combination of troop-type aptitude and correct equipment, not a
+separate positional statistic.
 
 ## Troop types
 
@@ -113,7 +182,10 @@ enemy front collapses.
 
 ## Still open
 
-- Damage and injury calculation
+- Exact initiative, hit, wound, and death formulas
+- Exact endurance consumption and recovery rules
+- Parallel processing of individual cycles at larger scales
+- Early-retreat conditions and additional losses
 - Definition of formation defeat or routing
 - Exact interpretation of ranks and repeated archer targeting
 - Commands available before and between phases
