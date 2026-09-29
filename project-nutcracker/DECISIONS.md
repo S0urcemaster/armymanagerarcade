@@ -409,3 +409,112 @@ that influence preparation for, or conditions in, the next battle.
   simulation.
 - The treatment of skipped opponents, defeat at the first place, NPC movement,
   and exact place modifiers remain unresolved.
+
+## D-017 — Five mirrored formation templates
+
+**Status:** Accepted
+
+Each of the five army-size levels has one predefined formation template. Every
+template contains dedicated blocks for infantry or spearmen, cavalry, and
+archers. The player fills the current template by assigning recruited soldiers
+to the positions where they fit best.
+
+The opposing army uses a mirrored formation. Before battle, espionage provides
+an approximate picture of each opposing block. The player uses this incomplete
+information to design their own troop assignment for that opponent.
+
+### Consequences
+
+- Army preparation is a spatial assignment problem rather than only a comparison
+  of total troop counts.
+- Formation complexity can increase across the five army-size levels while the
+  three troop types remain consistent.
+- Soldier suitability must be visible when assigning recruits to blocks.
+- Espionage information must map directly onto the same blocks shown in the
+  formation editor.
+- Mirrored blocks provide clear opposing relationships at battle start.
+- Exact template shapes, capacities, suitability rules, and whether assignments
+  may change during combat remain unresolved.
+
+## D-018 — Progressive formation scale and row-based combat ticks
+
+**Status:** Accepted
+
+The first two formation levels are defined as follows:
+
+1. **1–50 soldiers:** one infantry or spearmen block; soldiers can be placed
+   individually.
+2. **51–500 soldiers:** one block for each of the three troop types, with up to
+   roughly 166 soldiers per block and ten ranks per block.
+
+A combat tick resolves the encounter between two currently opposing ranks. If
+no other decision is available or necessary, the player repeatedly presses
+"Continue" and watches the ranks wear one another down over successive ticks.
+
+Higher army levels add more blocks and more soldiers. Control becomes
+progressively more abstract: early armies reward deliberate placement of every
+soldier, while the largest armies are managed through coarse distribution of
+large groups.
+
+### Consequences
+
+- The same formation concept scales from individual placement to aggregate
+  command instead of replacing the interface with an unrelated system.
+- Early individual optimization can create advantages and personal stories that
+  persist into later progression.
+- A block needs deterministic rules for rank width, overflow, advancement, and
+  losses.
+- "Continue" must remain fast and informative even when no command is required.
+- The block counts, rank counts, and control granularity of levels three through
+  five remain unresolved.
+
+## D-019 — Strategic ordering inside blocks
+
+**Status:** Accepted
+
+The order of soldiers within a block is a strategic choice. In particular, the
+player can place veterans in early ranks against a weak opposing block to give
+them more combat participation and experience, or preserve them in later ranks
+against a dangerous block so they are less exposed to early losses.
+
+### Consequences
+
+- There is no universally optimal strongest-first ordering.
+- Espionage estimates influence not only troop counts but also internal block
+  order.
+- Experience incentives compete with survival and immediate battle strength.
+- The formation editor should communicate the expected role and exposure of
+  early and late ranks.
+- Additional ordering choices should create comparable trade-offs rather than
+  merely adding maintenance work.
+
+## D-020 — Block assignment and stylized tactics
+
+**Status:** Accepted
+
+The player assigns recruits to troop-type blocks according to their suitability
+and then configures strategies for each block. Block strategy controls relevant
+ordering and combat behavior, allowing the same collection of soldiers to be
+used differently against different opponents.
+
+Tactics may be historically inspired but deliberately simplified or
+exaggerated for arcade clarity. Every tactic should provide a strong readable
+benefit while creating a meaningful vulnerability or opportunity cost.
+
+Accepted examples:
+
+- **Shield wall for spearmen:** nearly negates archer attacks but gives opposing
+  spearmen more room or opportunity in their following attack.
+- **Dispersed archers:** reduces the effect of the first cavalry attack but
+  requires a corresponding trade-off that remains to be defined.
+
+### Consequences
+
+- Formation preparation has two layers: assign soldiers to suitable blocks,
+  then choose block strategies.
+- Block strategies can automate detailed ordering at large army scales.
+- Espionage can reveal information that makes one strategy attractive without
+  guaranteeing it is correct.
+- Tactics need visible counters and must not become unconditional upgrades.
+- Strategy availability may depend on troop type, leader, training, technology,
+  equipment, or place, but those unlock rules remain open.
