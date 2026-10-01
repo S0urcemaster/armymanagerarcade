@@ -3,13 +3,15 @@ pub enum Screen {
     Menu,
     Campaign,
     Army,
-    Recruit,
+    Recruiting,
+    Battle,
 }
 
 pub enum GameCommand {
     ChangeScreen(Screen),
     InspectNext,
     PrepareBattle,
+    FleeBattle,
     ResetGame,
 }
 
@@ -79,7 +81,10 @@ impl Game {
                 self.notice = "Not enough espionage points.";
             }
             GameCommand::PrepareBattle => {
-                self.notice = "Formation saved. Battle preparation is ready.";
+                self.notice = "The battle has begun.";
+            }
+            GameCommand::FleeBattle => {
+                self.notice = "Your army escaped with losses still to be resolved.";
             }
             GameCommand::ChangeScreen(_) => {}
         }

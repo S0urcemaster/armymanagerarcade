@@ -32,6 +32,9 @@
 - On desktop, a full-width bottom bar with previous and next buttons replaces
   the position controls.
 - There is no persistent menu button.
+- The normal order is Splash, Campaign, Recruiting, and Army. Preparing battle
+  opens an exclusive Battle screen. While battle is active, only Splash and
+  Battle remain navigable. Leaving early requires a confirmed retreat.
 
 ## Persistence
 

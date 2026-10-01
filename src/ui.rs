@@ -17,6 +17,29 @@ pub struct UiState {
     pub screen: Screen,
     swipe_start: Option<Vec2>,
     confirm_new_game: bool,
+    confirm_flee: bool,
+    pub battle_active: bool,
+}
+
+pub struct UiAssets {
+    recruit_portraits: [Texture2D; 4],
+}
+
+impl UiAssets {
+    pub fn new() -> Self {
+        let portraits = [
+            include_bytes!("../assets/recruits/recruit-young-spearman.png").as_slice(),
+            include_bytes!("../assets/recruits/recruit-veteran-spearman.png").as_slice(),
+            include_bytes!("../assets/recruits/recruit-archer.png").as_slice(),
+            include_bytes!("../assets/recruits/recruit-rider.png").as_slice(),
+        ];
+        let recruit_portraits = portraits.map(|bytes| {
+            let texture = Texture2D::from_file_with_format(bytes, Some(ImageFormat::Png));
+            texture.set_filter(FilterMode::Linear);
+            texture
+        });
+        Self { recruit_portraits }
+    }
 }
 
 impl Default for UiState {
@@ -25,6 +48,8 @@ impl Default for UiState {
             screen: Screen::Menu,
             swipe_start: None,
             confirm_new_game: false,
+            confirm_flee: false,
+            battle_active: false,
         }
     }
 }
@@ -113,29 +138,40 @@ fn top_bar(game: &Game, title: &str) {
 const SCREENS: [Screen; 4] = [
     Screen::Menu,
     Screen::Campaign,
+    Screen::Recruiting,
     Screen::Army,
-    Screen::Recruit,
 ];
+const BATTLE_SCREENS: [Screen; 2] = [Screen::Menu, Screen::Battle];
 
-fn screen_index(screen: Screen) -> usize {
-    SCREENS
+fn navigation_screens(ui: &UiState) -> &'static [Screen] {
+    if ui.battle_active {
+        &BATTLE_SCREENS
+    } else {
+        &SCREENS
+    }
+}
+
+fn screen_index(screens: &[Screen], screen: Screen) -> usize {
+    screens
         .iter()
         .position(|candidate| *candidate == screen)
         .unwrap_or(0)
 }
 
-fn adjacent_screen(screen: Screen, offset: isize) -> Option<Screen> {
-    let index = screen_index(screen) as isize + offset;
-    (index >= 0 && index < SCREENS.len() as isize).then(|| SCREENS[index as usize])
+fn adjacent_screen(ui: &UiState, offset: isize) -> Option<Screen> {
+    let screens = navigation_screens(ui);
+    let index = screen_index(screens, ui.screen) as isize + offset;
+    (index >= 0 && index < screens.len() as isize).then(|| screens[index as usize])
 }
 
-fn screen_navigation(screen: Screen) -> Option<GameCommand> {
+fn screen_navigation(ui: &UiState) -> Option<GameCommand> {
+    let screens = navigation_screens(ui);
     if crate::storage::is_desktop() {
         let height = 54.0;
         let y = screen_height() - height;
         let half = screen_width() * 0.5;
 
-        if let Some(previous) = adjacent_screen(screen, -1) {
+        if let Some(previous) = adjacent_screen(ui, -1) {
             if button(Rect::new(0.0, y, half, height), "<", false) {
                 return Some(GameCommand::ChangeScreen(previous));
             }
@@ -143,7 +179,7 @@ fn screen_navigation(screen: Screen) -> Option<GameCommand> {
             draw_rectangle(0.0, y, half, height, colors::PANEL);
         }
 
-        if let Some(next) = adjacent_screen(screen, 1) {
+        if let Some(next) = adjacent_screen(ui, 1) {
             if button(Rect::new(half, y, half, height), ">", false) {
                 return Some(GameCommand::ChangeScreen(next));
             }
@@ -153,11 +189,11 @@ fn screen_navigation(screen: Screen) -> Option<GameCommand> {
         return None;
     }
 
-    let current = screen_index(screen);
+    let current = screen_index(screens, ui.screen);
     let y = screen_height() - 24.0;
-    let center = (SCREENS.len() as f32 - 1.0) * 0.5;
+    let center = (screens.len() as f32 - 1.0) * 0.5;
     let pointer = Vec2::from(mouse_position());
-    for (i, target) in SCREENS.iter().enumerate() {
+    for (i, target) in screens.iter().enumerate() {
         let x = screen_width() * 0.5 + (i as f32 - center) * 20.0;
         let hit_area = Rect::new(x - 12.0, y - 12.0, 24.0, 24.0);
         draw_circle(
@@ -188,7 +224,7 @@ fn swipe_command(ui: &mut UiState) -> Option<GameCommand> {
         let delta = pointer - start;
         if delta.x.abs() > 70.0 && delta.x.abs() > delta.y.abs() * 1.4 {
             let direction = if delta.x < 0.0 { 1 } else { -1 };
-            if let Some(next) = adjacent_screen(ui.screen, direction) {
+            if let Some(next) = adjacent_screen(ui, direction) {
                 return Some(GameCommand::ChangeScreen(next));
             }
         }
@@ -196,7 +232,12 @@ fn swipe_command(ui: &mut UiState) -> Option<GameCommand> {
     None
 }
 
-pub fn draw(game: &Game, rules: &GameRules, ui: &mut UiState) -> Option<GameCommand> {
+pub fn draw(
+    game: &Game,
+    rules: &GameRules,
+    ui: &mut UiState,
+    assets: &UiAssets,
+) -> Option<GameCommand> {
     draw_rectangle(
         0.0,
         0.0,
@@ -214,13 +255,17 @@ pub fn draw(game: &Game, rules: &GameRules, ui: &mut UiState) -> Option<GameComm
             top_bar(game, "ARMY");
             draw_army(game, rules)
         }
-        Screen::Recruit => {
-            top_bar(game, "RECRUIT");
-            draw_recruit()
+        Screen::Recruiting => {
+            top_bar(game, "RECRUITING");
+            draw_recruiting(assets)
+        }
+        Screen::Battle => {
+            top_bar(game, "BATTLE");
+            draw_battle(ui)
         }
     };
     command
-        .or_else(|| screen_navigation(ui.screen))
+        .or_else(|| screen_navigation(ui))
         .or_else(|| swipe_command(ui))
 }
 
@@ -248,15 +293,31 @@ fn draw_menu(game: &Game, rules: &GameRules, ui: &mut UiState) -> Option<GameCom
         colors::FRAME,
     );
     let y = screen_height() * 0.52;
-    if button(Rect::new(0.0, y, screen_width(), 58.0), "CONTINUE", true) {
-        return Some(GameCommand::ChangeScreen(Screen::Campaign));
-    }
+    let continue_target = if ui.battle_active {
+        Screen::Battle
+    } else {
+        Screen::Campaign
+    };
+    let continue_label = if ui.battle_active {
+        "RETURN TO BATTLE"
+    } else {
+        "CONTINUE"
+    };
     if button(
-        Rect::new(0.0, y + 70.0, screen_width(), 58.0),
-        "ARMY",
-        false,
+        Rect::new(0.0, y, screen_width(), 58.0),
+        continue_label,
+        true,
     ) {
-        return Some(GameCommand::ChangeScreen(Screen::Army));
+        return Some(GameCommand::ChangeScreen(continue_target));
+    }
+    if !ui.battle_active {
+        if button(
+            Rect::new(0.0, y + 70.0, screen_width(), 58.0),
+            "ARMY",
+            false,
+        ) {
+            return Some(GameCommand::ChangeScreen(Screen::Army));
+        }
     }
     if !ui.confirm_new_game {
         if button(
@@ -400,7 +461,7 @@ fn draw_army(game: &Game, rules: &GameRules) -> Option<GameCommand> {
     None
 }
 
-fn draw_recruit() -> Option<GameCommand> {
+fn draw_recruiting(assets: &UiAssets) -> Option<GameCommand> {
     let info = section(102.0, 70.0);
     label(
         "AVAILABLE RECRUITS",
@@ -409,16 +470,95 @@ fn draw_recruit() -> Option<GameCommand> {
         20.0,
         colors::FRAME,
     );
-    let recruit = section(184.0, 112.0);
-    draw_rectangle(0.0, recruit.y, 6.0, recruit.h, colors::FRAME);
-    label("LOCAL SPEARMAN", 14.0, recruit.y + 35.0, 20.0, colors::TEXT);
+    let recruits = [
+        ("YOUNG SPEARMAN", "40 gold  ·  Talent ?", "+3 INTEL"),
+        ("VETERAN SPEARMAN", "75 gold  ·  Talent ?", "+1 INTEL"),
+        ("DESERT ARCHER", "60 gold  ·  Talent ?", "+4 INTEL"),
+        ("STEPPE RIDER", "95 gold  ·  Talent ?", "+2 INTEL"),
+    ];
+    for (index, (name, cost, intel)) in recruits.iter().enumerate() {
+        let recruit = section(184.0 + index as f32 * 116.0, 104.0);
+        draw_texture_ex(
+            &assets.recruit_portraits[index],
+            0.0,
+            recruit.y,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(vec2(104.0, 104.0)),
+                ..Default::default()
+            },
+        );
+        label(name, 116.0, recruit.y + 30.0, 19.0, colors::TEXT);
+        label(cost, 116.0, recruit.y + 58.0, 15.0, colors::MUTED);
+        label(intel, 116.0, recruit.y + 84.0, 15.0, colors::FRAME);
+    }
+    None
+}
+
+fn draw_battle(ui: &mut UiState) -> Option<GameCommand> {
+    let status = section(102.0, 116.0);
     label(
-        "40 gold  ·  Talent ?",
+        "BATTLE IN PROGRESS",
         14.0,
-        recruit.y + 65.0,
+        status.y + 34.0,
+        20.0,
+        colors::FRAME,
+    );
+    label(
+        "Cycle 01  ·  Front row engaged",
+        14.0,
+        status.y + 67.0,
         16.0,
+        colors::TEXT,
+    );
+    label(
+        "Your losses 0%  ·  Enemy 0%",
+        14.0,
+        status.y + 94.0,
+        15.0,
         colors::MUTED,
     );
-    label("+3 ESPIONAGE", 14.0, recruit.y + 91.0, 15.0, colors::FRAME);
+
+    if button(
+        Rect::new(0.0, 236.0, screen_width(), 56.0),
+        "CONTINUE",
+        true,
+    ) {
+        return None;
+    }
+    if button(
+        Rect::new(0.0, 304.0, screen_width(), 56.0),
+        "START / PAUSE",
+        false,
+    ) {
+        return None;
+    }
+
+    if !ui.confirm_flee {
+        if button(
+            Rect::new(0.0, 394.0, screen_width(), 56.0),
+            "FLEE BATTLE",
+            false,
+        ) {
+            ui.confirm_flee = true;
+        }
+    } else {
+        wrapped_label(
+            "This will cost you some troops. Are you sure?",
+            14.0,
+            402.0,
+            screen_width() - 28.0,
+            17.0,
+            colors::TEXT,
+        );
+        let half = screen_width() * 0.5;
+        if button(Rect::new(0.0, 458.0, half, 54.0), "CANCEL", false) {
+            ui.confirm_flee = false;
+        }
+        if button(Rect::new(half, 458.0, half, 54.0), "FLEE", true) {
+            ui.confirm_flee = false;
+            return Some(GameCommand::FleeBattle);
+        }
+    }
     None
 }

@@ -692,6 +692,20 @@ of the current implementation.
 **Status:** Accepted
 
 Include the splash/menu screen in the same horizontal navigation sequence as
-Campaign, Army, and Recruit. Remove the persistent menu button. Show tappable
+Campaign, Army, and Recruiting. Remove the persistent menu button. Show tappable
 position controls for all screens at the bottom, and add explicit previous and
 next buttons for desktop pointer devices.
+
+## D-029 — Ordered preparation flow and exclusive battle
+
+**Status:** Accepted
+
+The normal screen order is Splash, Campaign, Recruiting, and Army. "Prepare
+Battle" on the Army screen starts an exclusive Battle screen. During battle,
+Campaign, Recruiting, and Army are inaccessible; the player may only move between
+Battle and Splash.
+
+The Battle screen owns its playback controls. Leaving it before resolution
+requires "Flee Battle" and the confirmation: "This will cost you some troops.
+Are you sure?" Confirming returns the player to Army. The actual troop cost is
+left unresolved until battle losses are implemented.
