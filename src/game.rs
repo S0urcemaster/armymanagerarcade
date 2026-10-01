@@ -1,5 +1,6 @@
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Screen {
+    Menu,
     Campaign,
     Army,
     Recruit,

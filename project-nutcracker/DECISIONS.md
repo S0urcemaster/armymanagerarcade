@@ -658,3 +658,16 @@ threshold, alongside wounded and killed soldiers.
 - Five and fifty are provisional balancing targets, not fixed simulation laws.
 - Recovery after battle and whether failed attacks consume endurance remain
   unresolved details.
+
+## D-026 — Portrait, edge-to-edge, swipe-based UI
+
+**Status:** Accepted
+
+Use an exclusively portrait mobile layout. On phones the game fills the
+available width without outer side margins. Avoid nested indentation, including
+in the future army tree, which should remain horizontally flat.
+
+Use a dedicated splash/menu screen for the game title and primary entry points.
+Do not repeat the title or a tab bar on every screen. Primary screens are
+navigated by horizontal left and right swipes, with a minimal control for
+returning to the menu.

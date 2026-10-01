@@ -7,8 +7,8 @@ use macroquad::prelude::*;
 fn window_conf() -> Conf {
     Conf {
         window_title: "Army Manager Arcade".into(),
-        window_width: 1100,
-        window_height: 760,
+        window_width: 390,
+        window_height: 844,
         high_dpi: true,
         window_resizable: true,
         ..Default::default()

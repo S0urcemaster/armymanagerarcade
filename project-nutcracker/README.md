@@ -28,6 +28,7 @@ See [PROCESS.md](PROCESS.md) for the ranking and decision rules.
 - [COMBAT.md](COMBAT.md) contains the accepted combat model and its open edges.
 - [ECONOMY.md](ECONOMY.md) contains accepted resources, rewards, and ownership
   rules.
+- [UI.md](UI.md) defines the durable interface and layout rules.
 - [NEXT.md](NEXT.md) is the small, current project frontier. It is rewritten as
   the project changes rather than used as an exhaustive backlog.
 

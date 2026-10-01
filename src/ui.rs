@@ -5,8 +5,8 @@ pub mod colors {
     use macroquad::prelude::Color;
     pub const BACKGROUND: Color = Color::new(0.035, 0.045, 0.055, 1.0);
     pub const FRAME: Color = Color::new(0.70, 0.55, 0.27, 1.0);
-    pub const PANEL: Color = Color::new(0.09, 0.11, 0.12, 1.0);
-    pub const PANEL_ALT: Color = Color::new(0.13, 0.15, 0.15, 1.0);
+    pub const PANEL: Color = Color::new(0.075, 0.09, 0.095, 1.0);
+    pub const PANEL_ALT: Color = Color::new(0.12, 0.14, 0.14, 1.0);
     pub const TEXT: Color = Color::new(0.91, 0.88, 0.78, 1.0);
     pub const MUTED: Color = Color::new(0.58, 0.60, 0.56, 1.0);
     pub const ACCENT: Color = Color::new(0.73, 0.22, 0.14, 1.0);
@@ -15,12 +15,14 @@ pub mod colors {
 
 pub struct UiState {
     pub screen: Screen,
+    swipe_start: Option<Vec2>,
 }
 
 impl Default for UiState {
     fn default() -> Self {
         Self {
-            screen: Screen::Campaign,
+            screen: Screen::Menu,
+            swipe_start: None,
         }
     }
 }
@@ -51,21 +53,9 @@ fn wrapped_label(text: &str, x: f32, y: f32, max_width: f32, size: f32, color: C
     }
 }
 
-fn panel(rect: Rect) {
-    draw_rectangle(rect.x, rect.y, rect.w, rect.h, colors::PANEL);
-    draw_rectangle_lines(
-        rect.x,
-        rect.y,
-        rect.w,
-        rect.h,
-        1.5,
-        Color::new(0.3, 0.3, 0.27, 1.0),
-    );
-}
-
 fn button(rect: Rect, text: &str, active: bool) -> bool {
-    let mouse = Vec2::from(mouse_position());
-    let hovered = rect.contains(mouse);
+    let pointer = Vec2::from(mouse_position());
+    let hovered = rect.contains(pointer);
     let fill = if active {
         colors::ACCENT
     } else if hovered {
@@ -97,155 +87,205 @@ fn button(rect: Rect, text: &str, active: bool) -> bool {
     hovered && is_mouse_button_pressed(MouseButton::Left)
 }
 
-fn formation_block(rect: Rect, title: &str, value: &str, color: Color) {
-    draw_rectangle(rect.x, rect.y, rect.w, rect.h, colors::PANEL_ALT);
-    draw_rectangle(rect.x, rect.y, 5.0, rect.h, color);
-    label(title, rect.x + 14.0, rect.y + 25.0, 19.0, colors::TEXT);
-    label(value, rect.x + 14.0, rect.y + 48.0, 16.0, colors::MUTED);
+fn section(y: f32, height: f32) -> Rect {
+    let rect = Rect::new(0.0, y, screen_width(), height);
+    draw_rectangle(rect.x, rect.y, rect.w, rect.h, colors::PANEL);
+    let border = Color::new(0.28, 0.28, 0.24, 1.0);
+    draw_line(0.0, y, screen_width(), y, 1.0, border);
+    draw_line(0.0, y + height, screen_width(), y + height, 1.0, border);
+    rect
+}
+
+fn top_bar(game: &Game) -> bool {
+    draw_rectangle(0.0, 0.0, screen_width(), 52.0, colors::PANEL);
+    label(
+        &format!("GOLD {}   INTEL {}", game.gold, game.espionage),
+        14.0,
+        32.0,
+        17.0,
+        colors::TEXT,
+    );
+    button(
+        Rect::new(screen_width() - 72.0, 7.0, 64.0, 38.0),
+        "MENU",
+        false,
+    )
+}
+
+fn screen_dots(screen: Screen) {
+    let current = match screen {
+        Screen::Campaign => 0,
+        Screen::Army => 1,
+        Screen::Recruit => 2,
+        Screen::Menu => return,
+    };
+    let y = screen_height() - 24.0;
+    for i in 0..3 {
+        draw_circle(
+            screen_width() * 0.5 + (i as f32 - 1.0) * 18.0,
+            y,
+            if i == current { 4.5 } else { 3.0 },
+            if i == current {
+                colors::FRAME
+            } else {
+                colors::MUTED
+            },
+        );
+    }
+}
+
+fn swipe_command(ui: &mut UiState) -> Option<GameCommand> {
+    if ui.screen == Screen::Menu {
+        return None;
+    }
+    let pointer = Vec2::from(mouse_position());
+    if is_mouse_button_pressed(MouseButton::Left) {
+        ui.swipe_start = Some(pointer);
+    }
+    if is_mouse_button_released(MouseButton::Left) {
+        let start = ui.swipe_start.take()?;
+        let delta = pointer - start;
+        if delta.x.abs() > 70.0 && delta.x.abs() > delta.y.abs() * 1.4 {
+            let next = match (ui.screen, delta.x < 0.0) {
+                (Screen::Campaign, true) => Screen::Army,
+                (Screen::Army, true) => Screen::Recruit,
+                (Screen::Recruit, false) => Screen::Army,
+                (Screen::Army, false) => Screen::Campaign,
+                _ => ui.screen,
+            };
+            if next != ui.screen {
+                return Some(GameCommand::ChangeScreen(next));
+            }
+        }
+    }
+    None
 }
 
 pub fn draw(game: &Game, rules: &GameRules, ui: &mut UiState) -> Option<GameCommand> {
-    let compact = screen_width() < 720.0;
-    let margin = if compact { 10.0 } else { 22.0 };
-    let frame = Rect::new(
-        margin,
-        margin,
-        screen_width() - margin * 2.0,
-        screen_height() - margin * 2.0,
-    );
     draw_rectangle(
-        frame.x,
-        frame.y,
-        frame.w,
-        frame.h,
-        Color::new(0.055, 0.065, 0.07, 1.0),
+        0.0,
+        0.0,
+        screen_width(),
+        screen_height(),
+        colors::BACKGROUND,
     );
-    draw_rectangle_lines(frame.x, frame.y, frame.w, frame.h, 3.0, colors::FRAME);
-
-    let pad = if compact { 14.0 } else { 24.0 };
-    let x = frame.x + pad;
-    let width = frame.w - pad * 2.0;
-    label(
-        "ARMY MANAGER",
-        x,
-        frame.y + 35.0,
-        if compact { 24.0 } else { 30.0 },
-        colors::TEXT,
-    );
-    label("ARCADE", x, frame.y + 57.0, 16.0, colors::FRAME);
-    label(
-        &format!("GOLD  {}   INTEL  {}", game.gold, game.espionage),
-        x + width - if compact { 170.0 } else { 210.0 },
-        frame.y + 38.0,
-        17.0,
-        colors::TEXT,
-    );
-
-    let nav_y = frame.y + 72.0;
-    let gap = 8.0;
-    let nav_w = (width - gap * 2.0) / 3.0;
-    for (i, (screen, name)) in [
-        (Screen::Campaign, "CAMPAIGN"),
-        (Screen::Army, "ARMY"),
-        (Screen::Recruit, "RECRUIT"),
-    ]
-    .into_iter()
-    .enumerate()
-    {
-        if button(
-            Rect::new(x + i as f32 * (nav_w + gap), nav_y, nav_w, 42.0),
-            name,
-            ui.screen == screen,
-        ) {
-            return Some(GameCommand::ChangeScreen(screen));
-        }
+    if ui.screen == Screen::Menu {
+        return draw_menu(game, rules);
     }
+    if top_bar(game) {
+        return Some(GameCommand::ChangeScreen(Screen::Menu));
+    }
+    let command = match ui.screen {
+        Screen::Campaign => draw_campaign(game, rules),
+        Screen::Army => draw_army(game, rules),
+        Screen::Recruit => draw_recruit(),
+        Screen::Menu => None,
+    };
+    screen_dots(ui.screen);
+    command.or_else(|| swipe_command(ui))
+}
 
-    let content_y = nav_y + 56.0;
-    let bottom = frame.y + frame.h - 64.0;
-    let content_h = bottom - content_y;
-    panel(Rect::new(x, content_y, width, content_h));
+fn draw_menu(game: &Game, rules: &GameRules) -> Option<GameCommand> {
+    let center = screen_width() * 0.5;
     label(
-        &format!("SIM {} HZ  ·  RENDER LIVE", rules.target_simulation_hz),
-        x,
-        frame.y + frame.h - 20.0,
+        "ARMY",
+        center - 83.0,
+        screen_height() * 0.24,
+        46.0,
+        colors::TEXT,
+    );
+    label(
+        "MANAGER",
+        center - 112.0,
+        screen_height() * 0.24 + 47.0,
+        46.0,
+        colors::TEXT,
+    );
+    label(
+        "ARCADE",
+        center - 35.0,
+        screen_height() * 0.24 + 75.0,
+        18.0,
+        colors::FRAME,
+    );
+    let y = screen_height() * 0.52;
+    if button(Rect::new(0.0, y, screen_width(), 58.0), "CONTINUE", true) {
+        return Some(GameCommand::ChangeScreen(Screen::Campaign));
+    }
+    if button(
+        Rect::new(0.0, y + 70.0, screen_width(), 58.0),
+        "ARMY",
+        false,
+    ) {
+        return Some(GameCommand::ChangeScreen(Screen::Army));
+    }
+    label(
+        &format!("STAGE {:02}  ·  {} SOLDIER", game.stage, game.soldiers),
+        14.0,
+        screen_height() - 32.0,
+        16.0,
+        colors::MUTED,
+    );
+    label(
+        &format!("{} HZ", rules.target_simulation_hz),
+        screen_width() - 55.0,
+        screen_height() - 32.0,
         14.0,
         colors::MUTED,
     );
-
-    match ui.screen {
-        Screen::Campaign => draw_campaign(
-            game,
-            rules,
-            Rect::new(x, content_y, width, content_h),
-            compact,
-        ),
-        Screen::Army => draw_army(
-            game,
-            rules,
-            Rect::new(x, content_y, width, content_h),
-            compact,
-        ),
-        Screen::Recruit => draw_recruit(Rect::new(x, content_y, width, content_h)),
-    }
+    None
 }
 
-fn draw_campaign(game: &Game, rules: &GameRules, area: Rect, compact: bool) -> Option<GameCommand> {
-    let p = 18.0;
+fn draw_campaign(game: &Game, rules: &GameRules) -> Option<GameCommand> {
+    let first = section(62.0, 116.0);
     label(
         &format!("STAGE {:02}  ·  BORDER OUTPOST", game.stage),
-        area.x + p,
-        area.y + 32.0,
-        21.0,
+        14.0,
+        first.y + 30.0,
+        20.0,
         colors::FRAME,
     );
+    label("YOUR POSITION", 14.0, first.y + 62.0, 18.0, colors::TEXT);
     label(
-        "A scripted road through the ancient world",
-        area.x + p,
-        area.y + 57.0,
-        17.0,
+        "+12 gold income  ·  1 soldier",
+        14.0,
+        first.y + 88.0,
+        16.0,
         colors::MUTED,
     );
-    let card_y = area.y + 78.0;
-    let card_w = if compact {
-        area.w - p * 2.0
-    } else {
-        (area.w - p * 3.0) * 0.5
-    };
-    formation_block(
-        Rect::new(area.x + p, card_y, card_w, 64.0),
-        "YOUR POSITION",
-        "+12 gold income  ·  1 soldier",
-        colors::GOOD,
-    );
-    let enemy_x = if compact {
-        area.x + p
-    } else {
-        area.x + p * 2.0 + card_w
-    };
-    let enemy_y = if compact { card_y + 76.0 } else { card_y };
-    formation_block(
-        Rect::new(enemy_x, enemy_y, card_w, 64.0),
+    let enemy = section(190.0, 128.0);
+    draw_rectangle(0.0, enemy.y, 6.0, enemy.h, colors::ACCENT);
+    label(
         "NEXT: THE HILL FORT",
-        "Enemy strength estimated  ·  Intel I",
-        colors::ACCENT,
+        14.0,
+        enemy.y + 31.0,
+        20.0,
+        colors::TEXT,
     );
-    let action_y = if compact {
-        enemy_y + 86.0
-    } else {
-        card_y + 88.0
-    };
+    label(
+        "Enemy strength estimated",
+        14.0,
+        enemy.y + 61.0,
+        16.0,
+        colors::MUTED,
+    );
+    label(
+        &format!("INTELLIGENCE LEVEL {}", game.intel_level),
+        14.0,
+        enemy.y + 88.0,
+        15.0,
+        colors::FRAME,
+    );
     wrapped_label(
         game.notice,
-        area.x + p,
-        action_y + 26.0,
-        area.w - p * 2.0,
+        14.0,
+        354.0,
+        screen_width() - 28.0,
         17.0,
         colors::TEXT,
     );
-    let bw = if compact { card_w } else { 210.0 };
     if button(
-        Rect::new(area.x + p, action_y + 48.0, bw, 48.0),
+        Rect::new(0.0, 402.0, screen_width(), 56.0),
         &format!("SCOUT  ·  {} INTEL", rules.espionage_cost),
         false,
     ) {
@@ -254,69 +294,40 @@ fn draw_campaign(game: &Game, rules: &GameRules, area: Rect, compact: bool) -> O
     None
 }
 
-fn draw_army(game: &Game, rules: &GameRules, area: Rect, compact: bool) -> Option<GameCommand> {
-    let p = 18.0;
+fn draw_army(game: &Game, rules: &GameRules) -> Option<GameCommand> {
+    let summary = section(62.0, 70.0);
     label(
         &format!(
-            "ARMY LEVEL {}  ·  {} SOLDIER",
+            "LEVEL {}  ·  {} SOLDIER",
             game.army_level(rules),
             game.soldiers
         ),
-        area.x + p,
-        area.y + 34.0,
-        21.0,
+        14.0,
+        summary.y + 42.0,
+        20.0,
         colors::FRAME,
     );
-    label("FORMATION", area.x + p, area.y + 68.0, 16.0, colors::MUTED);
-    let block = Rect::new(
-        area.x + p,
-        area.y + 82.0,
-        area.w - p * 2.0,
-        if compact { 105.0 } else { 150.0 },
-    );
-    draw_rectangle(
-        block.x,
-        block.y,
-        block.w,
-        block.h,
-        Color::new(0.12, 0.16, 0.13, 1.0),
-    );
-    draw_rectangle_lines(block.x, block.y, block.w, block.h, 2.0, colors::GOOD);
-    label(
-        "SPEARMEN BLOCK",
-        block.x + 16.0,
-        block.y + 30.0,
-        19.0,
-        colors::TEXT,
-    );
-    label(
-        "1 / 50 assigned",
-        block.x + 16.0,
-        block.y + 56.0,
-        16.0,
-        colors::MUTED,
-    );
+    let block = section(144.0, 196.0);
+    draw_rectangle(0.0, block.y, 6.0, block.h, colors::GOOD);
+    label("SPEARMEN BLOCK", 14.0, block.y + 34.0, 20.0, colors::TEXT);
+    label("1 / 50 ASSIGNED", 14.0, block.y + 64.0, 16.0, colors::MUTED);
+    let row_width = screen_width() / 10.0;
     for row in 0..10 {
-        let rw = (block.w - 32.0) / 10.0;
         draw_rectangle(
-            block.x + 16.0 + row as f32 * rw,
-            block.y + block.h - 28.0,
-            rw - 3.0,
-            8.0,
+            row as f32 * row_width + 2.0,
+            block.y + 116.0,
+            row_width - 4.0,
+            16.0,
             if row == 0 {
                 colors::FRAME
             } else {
-                colors::PANEL
+                colors::PANEL_ALT
             },
         );
     }
+    label("10 COMBAT ROWS", 14.0, block.y + 164.0, 15.0, colors::MUTED);
     if button(
-        Rect::new(
-            area.x + p,
-            block.y + block.h + 20.0,
-            if compact { block.w } else { 230.0 },
-            48.0,
-        ),
+        Rect::new(0.0, 354.0, screen_width(), 56.0),
         "PREPARE BATTLE",
         false,
     ) {
@@ -325,27 +336,25 @@ fn draw_army(game: &Game, rules: &GameRules, area: Rect, compact: bool) -> Optio
     None
 }
 
-fn draw_recruit(area: Rect) -> Option<GameCommand> {
-    let p = 18.0;
+fn draw_recruit() -> Option<GameCommand> {
+    let info = section(62.0, 70.0);
     label(
-        "RECRUIT POOL",
-        area.x + p,
-        area.y + 34.0,
-        21.0,
+        "AVAILABLE RECRUITS",
+        14.0,
+        info.y + 42.0,
+        20.0,
         colors::FRAME,
     );
+    let recruit = section(144.0, 112.0);
+    draw_rectangle(0.0, recruit.y, 6.0, recruit.h, colors::FRAME);
+    label("LOCAL SPEARMAN", 14.0, recruit.y + 35.0, 20.0, colors::TEXT);
     label(
-        "New candidates will appear here.",
-        area.x + p,
-        area.y + 66.0,
-        18.0,
+        "40 gold  ·  Talent ?",
+        14.0,
+        recruit.y + 65.0,
+        16.0,
         colors::MUTED,
     );
-    formation_block(
-        Rect::new(area.x + p, area.y + 90.0, area.w - p * 2.0, 68.0),
-        "LOCAL SPEARMAN",
-        "40 gold  ·  Talent ?  ·  +3 espionage",
-        colors::FRAME,
-    );
+    label("+3 ESPIONAGE", 14.0, recruit.y + 91.0, 15.0, colors::FRAME);
     None
 }
