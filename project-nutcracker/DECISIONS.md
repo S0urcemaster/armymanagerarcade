@@ -671,3 +671,27 @@ Use a dedicated splash/menu screen for the game title and primary entry points.
 Do not repeat the title or a tab bar on every screen. Primary screens are
 navigated by horizontal left and right swipes, with a minimal control for
 returning to the menu.
+
+## D-027 — Single browser campaign and future high score
+
+**Status:** Accepted
+
+Every primary screen has a concise screen title, while the full game title
+remains exclusive to the splash/menu screen.
+
+Persist one current campaign automatically in browser local storage. Do not
+provide multiple save-game slots. The splash/menu screen offers "New Game" and
+requires explicit confirmation before resetting the stored campaign.
+
+Keep a future high-score system in mind as separate persistent data that should
+not be erased when starting a new campaign. High-score rules and UI are not part
+of the current implementation.
+
+## D-028 — Splash in swipe navigation
+
+**Status:** Accepted
+
+Include the splash/menu screen in the same horizontal navigation sequence as
+Campaign, Army, and Recruit. Remove the persistent menu button. Show tappable
+position controls for all screens at the bottom, and add explicit previous and
+next buttons for desktop pointer devices.

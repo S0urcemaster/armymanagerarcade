@@ -35,3 +35,7 @@ The code is separated by responsibility:
 Gameplay numbers belong in `GameRules`; persistent values belong in `Game`;
 visual dimensions and colors belong in the UI. This keeps balancing and rules
 independent from presentation while avoiding unnecessary framework layers.
+
+The browser client automatically stores one current campaign in `localStorage`.
+There are no save slots; starting a new game replaces that campaign after a
+confirmation step.

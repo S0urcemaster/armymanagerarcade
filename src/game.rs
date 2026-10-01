@@ -10,6 +10,7 @@ pub enum GameCommand {
     ChangeScreen(Screen),
     InspectNext,
     PrepareBattle,
+    ResetGame,
 }
 
 /// Tunable game rules live here, separate from state and rendering.
@@ -68,6 +69,7 @@ impl Game {
 
     pub fn apply(&mut self, command: GameCommand, rules: &GameRules) {
         match command {
+            GameCommand::ResetGame => *self = Self::new(rules),
             GameCommand::InspectNext if self.espionage >= rules.espionage_cost => {
                 self.espionage -= rules.espionage_cost;
                 self.intel_level = (self.intel_level + 1).min(3);
@@ -81,5 +83,29 @@ impl Game {
             }
             GameCommand::ChangeScreen(_) => {}
         }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn encode(&self) -> String {
+        format!(
+            "1|{}|{}|{}|{}|{}",
+            self.gold, self.espionage, self.soldiers, self.stage, self.intel_level
+        )
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn decode(value: &str) -> Option<Self> {
+        let mut fields = value.split('|');
+        if fields.next()? != "1" {
+            return None;
+        }
+        Some(Self {
+            gold: fields.next()?.parse().ok()?,
+            espionage: fields.next()?.parse().ok()?,
+            soldiers: fields.next()?.parse().ok()?,
+            stage: fields.next()?.parse().ok()?,
+            intel_level: fields.next()?.parse().ok()?,
+            notice: "Saved campaign restored.",
+        })
     }
 }

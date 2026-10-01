@@ -1,4 +1,5 @@
 mod game;
+mod storage;
 mod ui;
 
 use game::{Game, GameCommand, GameRules};
@@ -18,7 +19,7 @@ fn window_conf() -> Conf {
 #[macroquad::main(window_conf)]
 async fn main() {
     let rules = GameRules::default();
-    let mut game = Game::new(&rules);
+    let mut game = storage::load().unwrap_or_else(|| Game::new(&rules));
     let mut ui_state = ui::UiState::default();
 
     loop {
@@ -27,7 +28,10 @@ async fn main() {
         if let Some(command) = ui::draw(&game, &rules, &mut ui_state) {
             match command {
                 GameCommand::ChangeScreen(screen) => ui_state.screen = screen,
-                other => game.apply(other, &rules),
+                other => {
+                    game.apply(other, &rules);
+                    storage::save(&game);
+                }
             }
         }
 

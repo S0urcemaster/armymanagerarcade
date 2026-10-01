@@ -22,11 +22,25 @@
 ## Navigation
 
 - The title appears on a dedicated splash/menu screen, not on every screen.
+- Every primary screen has its own concise screen title; the full game title is
+  still reserved for the splash/menu screen.
 - The primary screens have no persistent tab bar.
-- The player navigates between adjacent primary screens by swiping left or right.
-- Small position indicators may communicate the current screen without behaving
-  as tabs.
-- A minimal menu control returns to the splash/menu screen.
+- The splash/menu participates in the same horizontal sequence as the primary
+  screens and can be reached by swiping left or right.
+- Small bottom position controls communicate all screens and may be tapped for
+  direct navigation.
+- On desktop, a full-width bottom bar with previous and next buttons replaces
+  the position controls.
+- There is no persistent menu button.
+
+## Persistence
+
+- The browser keeps one automatically updated current campaign in local storage.
+- There are no selectable save-game slots.
+- Starting a new game requires confirmation before replacing the current
+  campaign.
+- A future high score is conceptually separate from the current campaign and
+  should survive a new-game reset.
 
 ## Rendering
 
