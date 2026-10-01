@@ -1,4 +1,5 @@
 mod game;
+mod recruiting;
 mod storage;
 mod ui;
 

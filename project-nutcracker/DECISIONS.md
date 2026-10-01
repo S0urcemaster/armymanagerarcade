@@ -709,3 +709,21 @@ The Battle screen owns its playback controls. Leaving it before resolution
 requires "Flee Battle" and the confirmation: "This will cost you some troops.
 Are you sure?" Confirming returns the player to Army. The actual troop cost is
 left unresolved until battle losses are implemented.
+
+## D-030 — Persistent recruit identities and scaling offers
+
+**Status:** Accepted
+
+Recruitment begins with individual people and gradually changes into offers for
+social groups and military contingents. Every offer has a stable generated
+identity derived from the campaign, stage, and offer slot. Reopening a screen
+must not silently reroll its people.
+
+A recruit starts with a first and family name, original civilian profession,
+preferred soldier type, talent, fitness, belonging, armour, intelligence value,
+personal gold, hiring cost, and one profession-related bonus and malus. The
+profession influences these values instead of serving as flavour text only.
+
+Group offers retain a named leader and group belonging. Their per-person hiring
+price is lower than an equivalent set of unrelated individuals. Exact balancing
+and the persistence format for recruited individuals remain open.

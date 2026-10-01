@@ -1,4 +1,5 @@
 use crate::game::{Game, GameCommand, GameRules, Screen};
+use crate::recruiting;
 use macroquad::prelude::*;
 
 pub mod colors {
@@ -257,7 +258,7 @@ pub fn draw(
         }
         Screen::Recruiting => {
             top_bar(game, "RECRUITING");
-            draw_recruiting(assets)
+            draw_recruiting(game, assets)
         }
         Screen::Battle => {
             top_bar(game, "BATTLE");
@@ -461,7 +462,7 @@ fn draw_army(game: &Game, rules: &GameRules) -> Option<GameCommand> {
     None
 }
 
-fn draw_recruiting(assets: &UiAssets) -> Option<GameCommand> {
+fn draw_recruiting(game: &Game, assets: &UiAssets) -> Option<GameCommand> {
     let info = section(102.0, 70.0);
     label(
         "AVAILABLE RECRUITS",
@@ -470,13 +471,8 @@ fn draw_recruiting(assets: &UiAssets) -> Option<GameCommand> {
         20.0,
         colors::FRAME,
     );
-    let recruits = [
-        ("YOUNG SPEARMAN", "40 gold  ·  Talent ?", "+3 INTEL"),
-        ("VETERAN SPEARMAN", "75 gold  ·  Talent ?", "+1 INTEL"),
-        ("DESERT ARCHER", "60 gold  ·  Talent ?", "+4 INTEL"),
-        ("STEPPE RIDER", "95 gold  ·  Talent ?", "+2 INTEL"),
-    ];
-    for (index, (name, cost, intel)) in recruits.iter().enumerate() {
+    let recruits = recruiting::generate_offers(0xA11CE, game.stage, 4);
+    for (index, recruit_data) in recruits.iter().enumerate() {
         let recruit = section(184.0 + index as f32 * 116.0, 104.0);
         draw_texture_ex(
             &assets.recruit_portraits[index],
@@ -488,9 +484,45 @@ fn draw_recruiting(assets: &UiAssets) -> Option<GameCommand> {
                 ..Default::default()
             },
         );
-        label(name, 116.0, recruit.y + 30.0, 19.0, colors::TEXT);
-        label(cost, 116.0, recruit.y + 58.0, 15.0, colors::MUTED);
-        label(intel, 116.0, recruit.y + 84.0, 15.0, colors::FRAME);
+        label(
+            &recruit_data.leader_name.to_uppercase(),
+            116.0,
+            recruit.y + 25.0,
+            18.0,
+            colors::TEXT,
+        );
+        label(
+            &format!(
+                "{} · {} · {}",
+                recruit_data.profession.label(),
+                recruit_data.preferred_type.label(),
+                recruit_data.size_label()
+            ),
+            116.0,
+            recruit.y + 49.0,
+            14.0,
+            colors::MUTED,
+        );
+        label(
+            &format!(
+                "{} GOLD · TAL {} · ARM {}",
+                recruit_data.hire_cost, recruit_data.talent, recruit_data.armour
+            ),
+            116.0,
+            recruit.y + 72.0,
+            14.0,
+            colors::TEXT,
+        );
+        label(
+            &format!(
+                "+{} INTEL · FIT {} · BEL {}",
+                recruit_data.intel, recruit_data.fitness, recruit_data.belonging
+            ),
+            116.0,
+            recruit.y + 92.0,
+            13.0,
+            colors::FRAME,
+        );
     }
     None
 }
