@@ -727,3 +727,17 @@ profession influences these values instead of serving as flavour text only.
 Group offers retain a named leader and group belonging. Their per-person hiring
 price is lower than an equivalent set of unrelated individuals. Exact balancing
 and the persistence format for recruited individuals remain open.
+
+## D-031 — Equipment is independent from aptitude
+
+**Status:** Accepted
+
+Each unit type has five armour quality levels. A recruit or group has an innate
+aptitude for Infantry, Archer, or Rider, but its currently supplied armour also
+belongs to one of those unit types independently. A recruit may therefore arrive
+with equipment that does not match its best role.
+
+Individual and group offers use the same fields and scales. Group values describe
+the group aggregate or its representative quality; the UI must not introduce a
+second incompatible statistics system merely because an offer contains multiple
+people.

@@ -68,6 +68,7 @@ pub struct RecruitOffer {
     pub leader_name: String,
     pub profession: OriginProfession,
     pub preferred_type: SoldierType,
+    pub armour_type: SoldierType,
     pub group_size: u32,
     pub talent: u8,
     pub fitness: u8,
@@ -113,6 +114,12 @@ const PROFESSIONS: &[OriginProfession] = &[
     OriginProfession::Sailor,
     OriginProfession::Trader,
     OriginProfession::Shepherd,
+];
+
+const SOLDIER_TYPES: &[SoldierType] = &[
+    SoldierType::Infantry,
+    SoldierType::Archer,
+    SoldierType::Rider,
 ];
 
 struct Roller(u64);
@@ -167,12 +174,13 @@ pub fn generate_offer(campaign_seed: u64, stage: usize, slot: usize) -> RecruitO
         roller.range(35, 75),
         belonging_mod + (group_size > 1) as i16 * 8,
     );
-    let armour = (roller.range(0, 2)
+    let armour = (roller.range(1, 4)
         + matches!(
             profession,
             OriginProfession::Smith | OriginProfession::Guard
         ) as u32)
-        .min(3) as u8;
+        .min(5) as u8;
+    let armour_type = SOLDIER_TYPES[roller.range(0, SOLDIER_TYPES.len() as u32 - 1) as usize];
     let intel = (roller.range(0, 2) as u8 + intel_mod).min(5);
     let personal_gold = (roller.range(1, 12) as i16 + gold_mod).max(0) as u32;
     let individual_cost = 18 + talent as u32 / 4 + armour as u32 * 9 + intel as u32 * 4;
@@ -183,6 +191,7 @@ pub fn generate_offer(campaign_seed: u64, stage: usize, slot: usize) -> RecruitO
         leader_name: format!("{first} {family}"),
         profession,
         preferred_type: profession.affinity(),
+        armour_type,
         group_size,
         talent,
         fitness,
@@ -217,5 +226,16 @@ mod tests {
         assert_eq!(generate_offer(17, 1, 0).group_size, 1);
         assert!(generate_offer(17, 12, 0).group_size >= 10);
         assert!(generate_offer(17, 65, 0).group_size >= 10_000);
+    }
+
+    #[test]
+    fn armour_has_five_levels_and_is_independent_from_aptitude() {
+        let offers = generate_offers(17, 6, 32);
+        assert!(offers.iter().all(|offer| (1..=5).contains(&offer.armour)));
+        assert!(
+            offers
+                .iter()
+                .any(|offer| offer.armour_type != offer.preferred_type)
+        );
     }
 }

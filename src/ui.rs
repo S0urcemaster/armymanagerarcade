@@ -19,11 +19,14 @@ pub struct UiState {
     swipe_start: Option<Vec2>,
     confirm_new_game: bool,
     confirm_flee: bool,
+    recruiting_scroll: f32,
+    recruiting_drag_y: Option<f32>,
     pub battle_active: bool,
 }
 
 pub struct UiAssets {
     recruit_portraits: [Texture2D; 4],
+    group_portraits: [Texture2D; 4],
 }
 
 impl UiAssets {
@@ -39,7 +42,21 @@ impl UiAssets {
             texture.set_filter(FilterMode::Linear);
             texture
         });
-        Self { recruit_portraits }
+        let groups = [
+            include_bytes!("../assets/groups/group-infantry.png").as_slice(),
+            include_bytes!("../assets/groups/group-archers.png").as_slice(),
+            include_bytes!("../assets/groups/group-riders.png").as_slice(),
+            include_bytes!("../assets/groups/group-mixed.png").as_slice(),
+        ];
+        let group_portraits = groups.map(|bytes| {
+            let texture = Texture2D::from_file_with_format(bytes, Some(ImageFormat::Png));
+            texture.set_filter(FilterMode::Linear);
+            texture
+        });
+        Self {
+            recruit_portraits,
+            group_portraits,
+        }
     }
 }
 
@@ -50,6 +67,8 @@ impl Default for UiState {
             swipe_start: None,
             confirm_new_game: false,
             confirm_flee: false,
+            recruiting_scroll: 0.0,
+            recruiting_drag_y: None,
             battle_active: false,
         }
     }
@@ -257,8 +276,9 @@ pub fn draw(
             draw_army(game, rules)
         }
         Screen::Recruiting => {
+            let command = draw_recruiting(game, ui, assets);
             top_bar(game, "RECRUITING");
-            draw_recruiting(game, assets)
+            command
         }
         Screen::Battle => {
             top_bar(game, "BATTLE");
@@ -462,20 +482,45 @@ fn draw_army(game: &Game, rules: &GameRules) -> Option<GameCommand> {
     None
 }
 
-fn draw_recruiting(game: &Game, assets: &UiAssets) -> Option<GameCommand> {
-    let info = section(102.0, 70.0);
-    label(
-        "AVAILABLE RECRUITS",
-        14.0,
-        info.y + 42.0,
-        20.0,
-        colors::FRAME,
-    );
-    let recruits = recruiting::generate_offers(0xA11CE, game.stage, 4);
+fn draw_recruiting(game: &Game, ui: &mut UiState, assets: &UiAssets) -> Option<GameCommand> {
+    const LIST_TOP: f32 = 172.0;
+    const CARD_STEP: f32 = 116.0;
+    let list_bottom = screen_height() - 54.0;
+    let max_scroll = (8.0 * CARD_STEP - (list_bottom - LIST_TOP) + 12.0).max(0.0);
+    let pointer = Vec2::from(mouse_position());
+
+    if pointer.y >= LIST_TOP && pointer.y <= list_bottom {
+        ui.recruiting_scroll =
+            (ui.recruiting_scroll - mouse_wheel().1 * 34.0).clamp(0.0, max_scroll);
+        if is_mouse_button_pressed(MouseButton::Left) {
+            ui.recruiting_drag_y = Some(pointer.y);
+        }
+    }
+    if is_mouse_button_down(MouseButton::Left) {
+        if let Some(previous_y) = ui.recruiting_drag_y.replace(pointer.y) {
+            ui.recruiting_scroll =
+                (ui.recruiting_scroll + previous_y - pointer.y).clamp(0.0, max_scroll);
+        }
+    }
+    if is_mouse_button_released(MouseButton::Left) {
+        ui.recruiting_drag_y = None;
+    }
+
+    let mut recruits = recruiting::generate_offers(0xA11CE, game.stage.min(3), 4);
+    recruits.extend(recruiting::generate_offers(0xA11CE, game.stage.max(6), 4));
     for (index, recruit_data) in recruits.iter().enumerate() {
-        let recruit = section(184.0 + index as f32 * 116.0, 104.0);
+        let y = 184.0 + index as f32 * CARD_STEP - ui.recruiting_scroll;
+        if y + 104.0 < LIST_TOP || y > list_bottom {
+            continue;
+        }
+        let recruit = section(y, 104.0);
+        let texture = if index < 4 {
+            &assets.recruit_portraits[index]
+        } else {
+            &assets.group_portraits[index - 4]
+        };
         draw_texture_ex(
-            &assets.recruit_portraits[index],
+            texture,
             0.0,
             recruit.y,
             WHITE,
@@ -493,7 +538,7 @@ fn draw_recruiting(game: &Game, assets: &UiAssets) -> Option<GameCommand> {
         );
         label(
             &format!(
-                "{} · {} · {}",
+                "{} · APT {} · {}",
                 recruit_data.profession.label(),
                 recruit_data.preferred_type.label(),
                 recruit_data.size_label()
@@ -505,8 +550,11 @@ fn draw_recruiting(game: &Game, assets: &UiAssets) -> Option<GameCommand> {
         );
         label(
             &format!(
-                "{} GOLD · TAL {} · ARM {}",
-                recruit_data.hire_cost, recruit_data.talent, recruit_data.armour
+                "{} GOLD · TAL {} · ARM {} {}",
+                recruit_data.hire_cost,
+                recruit_data.talent,
+                recruit_data.armour_type.label(),
+                recruit_data.armour
             ),
             116.0,
             recruit.y + 72.0,
@@ -524,6 +572,16 @@ fn draw_recruiting(game: &Game, assets: &UiAssets) -> Option<GameCommand> {
             colors::FRAME,
         );
     }
+
+    draw_rectangle(0.0, 92.0, screen_width(), 80.0, colors::BACKGROUND);
+    let info = section(102.0, 70.0);
+    label(
+        "AVAILABLE RECRUITS  ·  SCROLL",
+        14.0,
+        info.y + 42.0,
+        19.0,
+        colors::FRAME,
+    );
     None
 }
 
