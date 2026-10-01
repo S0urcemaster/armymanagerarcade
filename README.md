@@ -12,3 +12,26 @@ The project is developed with the decision-guided process documented in
 
 Ask **"What comes next?"** to get a short, ranked list of the most important
 current project concerns and a recommendation for the next decision or action.
+
+## Development
+
+The client is a Rust application rendered into a browser canvas with Macroquad.
+
+```sh
+cargo run
+./scripts/build-web.sh
+python3 -m http.server 8080 -d dist
+```
+
+Then open `http://127.0.0.1:8080`.
+
+The code is separated by responsibility:
+
+- `src/game.rs` contains state, commands, and configurable game rules without
+  rendering code.
+- `src/ui.rs` contains the responsive canvas layout and custom game widgets.
+- `src/main.rs` owns the application loop and passes UI commands to the game.
+
+Gameplay numbers belong in `GameRules`; persistent values belong in `Game`;
+visual dimensions and colors belong in the UI. This keeps balancing and rules
+independent from presentation while avoiding unnecessary framework layers.
