@@ -12,6 +12,7 @@ pub mod colors {
     pub const MUTED: Color = Color::new(0.58, 0.60, 0.56, 1.0);
     pub const ACCENT: Color = Color::new(0.73, 0.22, 0.14, 1.0);
     pub const GOOD: Color = Color::new(0.30, 0.58, 0.35, 1.0);
+    pub const COIN: Color = Color::new(0.93, 0.69, 0.20, 1.0);
 }
 
 pub struct UiState {
@@ -98,6 +99,16 @@ fn wrapped_label(text: &str, x: f32, y: f32, max_width: f32, size: f32, color: C
     if !line.is_empty() {
         label(&line, x, baseline, size, color);
     }
+}
+
+fn coin_price(value: u32, right: f32, baseline: f32) {
+    let text = value.to_string();
+    let dimensions = measure_text(&text, None, 19, 1.0);
+    let coin_x = right - dimensions.width - 17.0;
+    let coin_y = baseline - 6.0;
+    draw_circle(coin_x, coin_y, 7.0, colors::COIN);
+    draw_circle_lines(coin_x, coin_y, 4.0, 1.2, colors::PANEL);
+    label(&text, coin_x + 11.0, baseline, 19.0, colors::COIN);
 }
 
 fn button(rect: Rect, text: &str, active: bool) -> bool {
@@ -533,28 +544,39 @@ fn draw_recruiting(game: &Game, ui: &mut UiState, assets: &UiAssets) -> Option<G
             &recruit_data.leader_name.to_uppercase(),
             116.0,
             recruit.y + 25.0,
-            18.0,
+            16.0,
             colors::TEXT,
         );
+        coin_price(
+            recruit_data.hire_cost,
+            screen_width() - 12.0,
+            recruit.y + 25.0,
+        );
+        let offer_kind = if recruit_data.is_group() {
+            format!(
+                "{} {}",
+                recruit_data.composition.label(),
+                recruit_data.group_size
+            )
+        } else {
+            "Individual".to_owned()
+        };
         label(
             &format!(
-                "{} · APT {} · {}",
+                "{} · {} · +{} INT",
                 recruit_data.profession.label(),
-                recruit_data.preferred_type.label(),
-                recruit_data.size_label()
+                offer_kind,
+                recruit_data.intel
             ),
             116.0,
             recruit.y + 49.0,
-            14.0,
+            13.0,
             colors::MUTED,
         );
         label(
             &format!(
-                "{} GOLD · TAL {} · ARM {} {}",
-                recruit_data.hire_cost,
-                recruit_data.talent,
-                recruit_data.armour_type.label(),
-                recruit_data.armour
+                "TAL {}   FIT {}   BEL {}",
+                recruit_data.talent, recruit_data.fitness, recruit_data.belonging
             ),
             116.0,
             recruit.y + 72.0,
@@ -563,12 +585,15 @@ fn draw_recruiting(game: &Game, ui: &mut UiState, assets: &UiAssets) -> Option<G
         );
         label(
             &format!(
-                "+{} INTEL · FIT {} · BEL {}",
-                recruit_data.intel, recruit_data.fitness, recruit_data.belonging
+                "ARM {} · Q{} {} · DUR {}%",
+                recruit_data.armour_type.label(),
+                recruit_data.armour_quality.level(),
+                recruit_data.armour_quality.label(),
+                recruit_data.armour_durability
             ),
             116.0,
             recruit.y + 92.0,
-            13.0,
+            12.0,
             colors::FRAME,
         );
     }

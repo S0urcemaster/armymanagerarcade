@@ -724,9 +724,8 @@ preferred soldier type, talent, fitness, belonging, armour, intelligence value,
 personal gold, hiring cost, and one profession-related bonus and malus. The
 profession influences these values instead of serving as flavour text only.
 
-Group offers retain a named leader and group belonging. Their per-person hiring
-price is lower than an equivalent set of unrelated individuals. Exact balancing
-and the persistence format for recruited individuals remain open.
+Group offers retain a named leader and group belonging. Exact balancing and the
+persistence format for recruited individuals remain open.
 
 ## D-031 — Equipment is independent from aptitude
 
@@ -741,3 +740,19 @@ Individual and group offers use the same fields and scales. Group values describ
 the group aggregate or its representative quality; the UI must not introduce a
 second incompatible statistics system merely because an offer contains multiple
 people.
+
+## D-032 — One-time recruitment price and armour condition
+
+**Status:** Accepted
+
+Recruitment is paid once. There is no monthly, yearly, or other recurring wage
+cycle. A group's displayed price is the exact sum of its members' individual
+recruitment prices, without a group discount.
+
+Talent, fitness, and belonging use the same scale for people and groups. Group
+values are averages. Pure infantry, archer, or rider groups are uncommon; most
+group offers are Mixed.
+
+Armour has both quality and durability. Durability can be maintained or repaired
+with gold. The five provisional quality names, usable for every unit type, are:
+Improvised, Standard, Reinforced, Veteran, and Royal.

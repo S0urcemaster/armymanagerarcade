@@ -16,6 +16,68 @@ impl SoldierType {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Composition {
+    Infantry,
+    Archers,
+    Riders,
+    Mixed,
+}
+
+impl Composition {
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Infantry => "Infantry",
+            Self::Archers => "Archers",
+            Self::Riders => "Riders",
+            Self::Mixed => "Mixed",
+        }
+    }
+
+    fn pure(soldier_type: SoldierType) -> Self {
+        match soldier_type {
+            SoldierType::Infantry => Self::Infantry,
+            SoldierType::Archer => Self::Archers,
+            SoldierType::Rider => Self::Riders,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ArmourQuality {
+    Improvised,
+    Standard,
+    Reinforced,
+    Veteran,
+    Royal,
+}
+
+impl ArmourQuality {
+    pub fn from_level(level: u8) -> Self {
+        match level {
+            1 => Self::Improvised,
+            2 => Self::Standard,
+            3 => Self::Reinforced,
+            4 => Self::Veteran,
+            _ => Self::Royal,
+        }
+    }
+
+    pub fn level(self) -> u8 {
+        self as u8 + 1
+    }
+
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Improvised => "Improvised",
+            Self::Standard => "Standard",
+            Self::Reinforced => "Reinforced",
+            Self::Veteran => "Veteran",
+            Self::Royal => "Royal",
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum OriginProfession {
     Farmer,
     Hunter,
@@ -68,12 +130,14 @@ pub struct RecruitOffer {
     pub leader_name: String,
     pub profession: OriginProfession,
     pub preferred_type: SoldierType,
+    pub composition: Composition,
     pub armour_type: SoldierType,
     pub group_size: u32,
     pub talent: u8,
     pub fitness: u8,
     pub belonging: u8,
-    pub armour: u8,
+    pub armour_quality: ArmourQuality,
+    pub armour_durability: u8,
     pub intel: u8,
     pub personal_gold: u32,
     pub hire_cost: u32,
@@ -84,14 +148,6 @@ pub struct RecruitOffer {
 impl RecruitOffer {
     pub fn is_group(&self) -> bool {
         self.group_size > 1
-    }
-
-    pub fn size_label(&self) -> String {
-        if self.is_group() {
-            format!("{} recruits", self.group_size)
-        } else {
-            "Individual".to_owned()
-        }
     }
 }
 
@@ -174,29 +230,39 @@ pub fn generate_offer(campaign_seed: u64, stage: usize, slot: usize) -> RecruitO
         roller.range(35, 75),
         belonging_mod + (group_size > 1) as i16 * 8,
     );
-    let armour = (roller.range(1, 4)
+    let armour_level = (roller.range(1, 4)
         + matches!(
             profession,
             OriginProfession::Smith | OriginProfession::Guard
         ) as u32)
         .min(5) as u8;
+    let armour_quality = ArmourQuality::from_level(armour_level);
+    let armour_durability = roller.range(45, 100) as u8;
     let armour_type = SOLDIER_TYPES[roller.range(0, SOLDIER_TYPES.len() as u32 - 1) as usize];
+    let preferred_type = profession.affinity();
+    let composition = if group_size == 1 || roller.range(0, 9) >= 8 {
+        Composition::pure(preferred_type)
+    } else {
+        Composition::Mixed
+    };
     let intel = (roller.range(0, 2) as u8 + intel_mod).min(5);
-    let personal_gold = (roller.range(1, 12) as i16 + gold_mod).max(0) as u32;
-    let individual_cost = 18 + talent as u32 / 4 + armour as u32 * 9 + intel as u32 * 4;
-    let group_discount = if group_size == 1 { 100 } else { 82 };
-    let hire_cost = individual_cost * group_size * group_discount / 100;
+    let personal_gold_per_member = (roller.range(1, 12) as i16 + gold_mod).max(0) as u32;
+    let personal_gold = personal_gold_per_member * group_size;
+    let individual_cost = 18 + talent as u32 / 4 + armour_level as u32 * 9 + intel as u32 * 4;
+    let hire_cost = individual_cost * group_size;
 
     RecruitOffer {
         leader_name: format!("{first} {family}"),
         profession,
-        preferred_type: profession.affinity(),
+        preferred_type,
+        composition,
         armour_type,
         group_size,
         talent,
         fitness,
         belonging,
-        armour,
+        armour_quality,
+        armour_durability,
         intel,
         personal_gold,
         hire_cost,
@@ -231,11 +297,28 @@ mod tests {
     #[test]
     fn armour_has_five_levels_and_is_independent_from_aptitude() {
         let offers = generate_offers(17, 6, 32);
-        assert!(offers.iter().all(|offer| (1..=5).contains(&offer.armour)));
+        assert!(
+            offers
+                .iter()
+                .all(|offer| (1..=5).contains(&offer.armour_quality.level()))
+        );
         assert!(
             offers
                 .iter()
                 .any(|offer| offer.armour_type != offer.preferred_type)
         );
+    }
+
+    #[test]
+    fn groups_are_usually_mixed_and_cost_the_sum_of_members() {
+        let offers = generate_offers(19, 6, 100);
+        let mixed = offers
+            .iter()
+            .filter(|offer| offer.composition == Composition::Mixed)
+            .count();
+        assert!(mixed >= 70);
+        for offer in offers {
+            assert_eq!(offer.hire_cost % offer.group_size, 0);
+        }
     }
 }
